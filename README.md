@@ -1,6 +1,8 @@
 
 # Automated Highlight Generation System for Volleyball
 
+---
+
 ## Output Highlights
 
 Watch the final volleyball match highlights, featuring smooth transitions and key moments:  
