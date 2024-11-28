@@ -1,6 +1,13 @@
 
 # Automated Highlight Generation System for Volleyball
 
+## Output Highlights
+
+Watch the final volleyball match highlights, featuring smooth transitions and key moments:  
+[![Watch Highlights on YouTube](https://img.shields.io/badge/YouTube-Watch%20Now-red?logo=youtube)](https://youtu.be/JUGTQxPZ4bU)
+
+---
+
 ## Overview
 The **Automated Highlight Generation System for Volleyball** is an advanced system designed to automatically detect and generate highlights from volleyball match videos. It leverages machine learning techniques for trajectory analysis, along with advanced video processing to create smooth transitions between key moments in the game. This system is useful for coaches, analysts, and sports media companies looking for efficient ways to summarize games and create engaging video content.
 
@@ -233,8 +240,8 @@ The **Automated Highlight Generation System for Volleyball** successfully genera
 
 
 5. **Final Output**:
-   - The final video, **enhanced_transition_full_video.mp4**, consists of highlights with smooth transitions, ready for presentation or sharing with audiences.
-
+   - The final video, **enhanced_transition_full_video.mp4**, consists of highlights with smooth transitions, ready for presentation or sharing with audiences. This video showcases the model's ability to generate dynamic, engaging highlight clips with high-quality video transitions.
+    [Watch the Full Video Highlight on YouTube](https://youtu.be/JUGTQxPZ4bU)
 ---
 
 ## Evaluation and Metrics

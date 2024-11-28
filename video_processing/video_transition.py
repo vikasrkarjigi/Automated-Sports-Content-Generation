@@ -3,143 +3,146 @@ import numpy as np
 
 def create_transition(cap, start_frame, end_frame, transition_type='fade', duration_frames=30):
     """
-    Create a high-quality transition between two frames in a video.
+    Create a transition between two frames in a video.
 
     Parameters:
     cap: cv2.VideoCapture object
     start_frame: int, starting frame number
     end_frame: int, ending frame number
-    transition_type: str, type of transition ('fade', 'wipe_left', 'wipe_right', 'dissolve', 'motion_blend')
+    transition_type: str, type of transition ('fade', 'wipe_left', 'wipe_right', 'dissolve')
     duration_frames: int, number of frames for the transition
 
     Returns:
     list of frames containing the transition
     """
-    # Save the current position
+    # Save original position
     original_pos = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
     # Get the two frames
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-    ret1, frame1 = cap.read()
+    ret, frame1 = cap.read()
     cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame)
-    ret2, frame2 = cap.read()
+    ret, frame2 = cap.read()
 
-    if not ret1 or not ret2 or frame1 is None or frame2 is None:
-        raise ValueError("Could not read the specified frames from the video.")
+    if not ret or frame1 is None or frame2 is None:
+        raise ValueError("Could not read frames")
 
     # Convert frames to float32 for better transition quality
     frame1 = frame1.astype(np.float32)
     frame2 = frame2.astype(np.float32)
 
-    height, width, _ = frame1.shape
     transition_frames = []
 
     for i in range(duration_frames):
         progress = i / (duration_frames - 1)
 
         if transition_type == 'fade':
-            # Improved fade with gamma correction
+            # Simple fade transition
             frame = cv2.addWeighted(frame1, 1 - progress, frame2, progress, 0)
-            frame = cv2.pow(frame / 255.0, 1.2) * 255.0  # Gamma correction
 
         elif transition_type == 'wipe_left':
-            # Smooth gradient wipe from left to right
+            # Wipe from left to right
+            width = frame1.shape[1]
             cut_point = int(width * progress)
-            gradient = np.linspace(0, 1, cut_point).reshape(1, -1, 1)
-            gradient = np.tile(gradient, (height, 1, 3))
             frame = frame1.copy()
-            frame[:, :cut_point] = frame1[:, :cut_point] * (1 - gradient) + frame2[:, :cut_point] * gradient
+            frame[:, :cut_point] = frame2[:, :cut_point]
 
         elif transition_type == 'wipe_right':
-            # Smooth gradient wipe from right to left
+            # Wipe from right to left
+            width = frame1.shape[1]
             cut_point = int(width * (1 - progress))
-            gradient = np.linspace(0, 1, width - cut_point).reshape(1, -1, 1)
-            gradient = np.tile(gradient, (height, 1, 3))
             frame = frame1.copy()
-            frame[:, cut_point:] = frame1[:, cut_point:] * (1 - gradient) + frame2[:, cut_point:] * gradient
+            frame[:, cut_point:] = frame2[:, cut_point:]
 
         elif transition_type == 'dissolve':
-            # Non-linear dissolve using Perlin noise
-            mask = (np.random.normal(loc=progress, scale=0.1, size=(height, width)) > 0.5).astype(np.float32)
-            mask = cv2.GaussianBlur(mask, (15, 15), 0)  # Smooth dissolve effect
+            # Dissolve with random pixels
+            mask = np.random.random(frame1.shape[:2]) < progress
             mask = np.stack([mask] * 3, axis=2)
-            frame = frame1 * (1 - mask) + frame2 * mask
-
-        elif transition_type == 'motion_blend':
-            # Motion-aware blend using optical flow
-            gray1 = cv2.cvtColor(frame1.astype(np.uint8), cv2.COLOR_BGR2GRAY)
-            gray2 = cv2.cvtColor(frame2.astype(np.uint8), cv2.COLOR_BGR2GRAY)
-            flow = cv2.calcOpticalFlowFarneback(gray1, gray2, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-            dx, dy = flow[:, :, 0] * progress, flow[:, :, 1] * progress
-            map_x, map_y = np.meshgrid(np.arange(width), np.arange(height))
-            map_x = (map_x + dx).astype(np.float32)
-            map_y = (map_y + dy).astype(np.float32)
-            warped_frame2 = cv2.remap(frame2, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-            frame = cv2.addWeighted(frame1, 1 - progress, warped_frame2, progress, 0)
+            frame = np.where(mask, frame2, frame1)
 
         else:
             raise ValueError(f"Unknown transition type: {transition_type}")
 
-        # Convert back to uint8
-        frame_uint8 = np.clip(frame, 0, 255).astype(np.uint8)
+        # Convert back to uint8 for display
+        frame_uint8 = frame.astype(np.uint8)
         transition_frames.append(frame_uint8)
 
-    # Restore the original position
+    # Restore original position
     cap.set(cv2.CAP_PROP_POS_FRAMES, original_pos)
 
     return transition_frames
 
+
 def main():
     # Open the video file
-    video_path = 'output_video.mp4'  # Replace with your video file path
-    cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture('output_video.mp4')
 
-    if not cap.isOpened():
-        print(f"Error: Could not open video file {video_path}")
-        return
-
-    # Get video properties
-    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    # Get total number of frames in the video
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    # Create a video writer for saving the final video
-    output_path = 'enhanced_transition_full_video.mp4'
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
-
-    # Loop through the video, applying transitions between frames
     try:
-        transition_type = 'fade'  # Try 'fade', 'wipe_left', 'wipe_right', 'dissolve', or 'motion_blend'
-        transition_duration = 30  # Length of the transition in frames
+        # Define frames for significant events (modify these according to the video duration)
+        game_start_frame = 100  # Game start frame
+        new_set_frame = 300  # Frame where a new set starts
+        point_scored_frame = 500  # Frame where a point is scored
 
-        # Read frames and apply transitions
-        prev_frame = None
-        for i in range(total_frames - transition_duration):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+        # Define the next event frame (new set or point scored)
+        next_event_frame = 200
+
+        # Create transitions for multiple events
+        transitions = []
+        transitions.append(
+            create_transition(cap, game_start_frame, next_event_frame, transition_type='fade', duration_frames=30))
+        transitions.append(
+            create_transition(cap, new_set_frame, new_set_frame + 100, transition_type='wipe_left', duration_frames=30))
+        transitions.append(
+            create_transition(cap, point_scored_frame, point_scored_frame + 100, transition_type='dissolve',
+                              duration_frames=30))
+
+        # Create video writer for saving the transition
+        first_frame = transitions[0][0]
+        out = cv2.VideoWriter('highlight_with_transitions.mp4',
+                              cv2.VideoWriter_fourcc(*'mp4v'),
+                              30,
+                              (first_frame.shape[1], first_frame.shape[0]))
+
+        # Loop through the video and write frames to output
+        current_transition_index = 0
+        transition_frames = []
+        current_frame_pos = 0
+
+        while True:
             ret, frame = cap.read()
-
             if not ret:
                 break
 
-            # Apply transition between consecutive frames
-            if prev_frame is not None:
-                transition_frames = create_transition(
-                    cap, i - transition_duration, i,
-                    transition_type=transition_type,
-                    duration_frames=transition_duration
-                )
+            current_frame_pos = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
-                # Write transition frames to output
+            # Apply the current transition only if we are at the event frame
+            if current_frame_pos == game_start_frame and current_transition_index == 0:
+                transition_frames = transitions[current_transition_index]
+                current_transition_index += 1
+
+            elif current_frame_pos == new_set_frame and current_transition_index == 1:
+                transition_frames = transitions[current_transition_index]
+                current_transition_index += 1
+
+            elif current_frame_pos == point_scored_frame and current_transition_index == 2:
+                transition_frames = transitions[current_transition_index]
+                current_transition_index += 1
+
+            # If a transition is being applied, write the transition frames
+            if transition_frames:
                 for transition_frame in transition_frames:
                     out.write(transition_frame)
+                transition_frames = []  # Reset transition frames once written
 
-            # Write the current frame (without transition)
+            # Write the current frame to the output video
             out.write(frame)
-            prev_frame = frame
 
-        print(f"Final video with transitions saved as '{output_path}'")
+            # If we've processed all frames, break the loop
+            if current_frame_pos >= total_frames:
+                break
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
