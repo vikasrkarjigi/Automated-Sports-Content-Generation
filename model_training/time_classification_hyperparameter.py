@@ -10,8 +10,8 @@ from tqdm import tqdm
 
 # Load datasets
 
-data = pd.read_csv('provided_data.csv', header=None, names=['frame', 'xc', 'yc', 'w', 'h', 'effort'])
-target = pd.read_csv('target.csv')  # Ensure columns 'frame' and 'value'
+data = pd.read_csv('data/provided_data.csv', header=None, names=['frame', 'xc', 'yc', 'w', 'h', 'effort'])
+target = pd.read_csv('data/target.csv')  # Ensure columns 'frame' and 'value'
 
 # Data Cleaning and Feature Engineering
 data['effort'] = pd.to_numeric(data['effort'], errors='coerce')
@@ -81,7 +81,7 @@ plt.title('SVM Hyperparameter Tuning (F1 Score)')
 plt.xlabel('Gamma')
 plt.ylabel('C')
 plt.tight_layout()
-plt.savefig('weighted_f1_heatmap.png')
+plt.savefig('model_training/results/f1_score_heatmap.png')
 plt.show()
 
 # Optional: Plot macro F1 score as well (for comparison)
@@ -91,7 +91,7 @@ plt.title('SVM Hyperparameter Tuning (Macro F1 Score)')
 plt.xlabel('Gamma')
 plt.ylabel('C')
 plt.tight_layout()
-plt.savefig('macro_f1_heatmap.png')
+plt.savefig('model_training/results/macro_f1_heatmap.png')
 plt.show()
 
 # Train the best model on the entire training data
@@ -107,4 +107,4 @@ print(f"Best parameters: {best_params}")
 print(f"Final Weighted F1 Score on Test Data: {f1:.3f}")
 
 predictions_df = pd.DataFrame({'frame': merged.loc[indices_test, 'frame'], 'value': y_pred})
-predictions_df.to_csv('predictions_svm.csv', index=False)
+predictions_df.to_csv('model_training/results/predictions_svm_hyperparameter.csv', index=False)

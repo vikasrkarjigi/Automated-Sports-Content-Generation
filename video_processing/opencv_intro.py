@@ -7,7 +7,7 @@ def process_frame(frame, apply_filters=True, crop=None):
     if crop:
         h, w = frame.shape[:2]
         x0, y0, crop_w, crop_h = [int(c * 0.01 * dim) for c, dim in zip(crop, [w, h, w, h])]
-        frame = frame[y0:y0+crop_h, x0:x0+crop_w]
+        frame = frame[y0:y0 + crop_h, x0:x0 + crop_w]
 
     if apply_filters:
         # Convert to grayscale
@@ -52,7 +52,8 @@ def main():
 
     # Calculate dimensions after cropping (if crop is specified)
     if args.crop:
-        x0, y0, crop_w, crop_h = [int(c * 0.01 * dim) for c, dim in zip(args.crop, [original_width, original_height, original_width, original_height])]
+        x0, y0, crop_w, crop_h = [int(c * 0.01 * dim) for c, dim in
+                                  zip(args.crop, [original_width, original_height, original_width, original_height])]
         width, height = crop_w, crop_h
     else:
         width, height = original_width, original_height
@@ -67,11 +68,12 @@ def main():
         with open(args.csv, 'r') as csvfile:
             csv_reader = csv.DictReader(csvfile)
             for row in csv_reader:
-                frame_filter[int(row['frame'])] = int(row['value'])
-        
+                # Convert values to integers, handling floats in the CSV
+                frame_filter[int(float(row['frame']))] = int(float(row['value']))
+
         # Find the first non-zero value frame
         frame_number = next((frame for frame, value in frame_filter.items() if value != 0), 0)
-        
+
         # Set the video capture to the first non-zero value frame
         input_video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
     else:

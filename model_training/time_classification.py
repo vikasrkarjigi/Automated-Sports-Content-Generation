@@ -8,7 +8,7 @@ from tqdm import tqdm
 from sklearn.model_selection import ParameterSampler
 
 # Load provided_data.csv
-data = pd.read_csv('provided_data.csv', header=None, names=['frame', 'xc', 'yc', 'w', 'h', 'effort'])
+data = pd.read_csv('data/provided_data.csv', header=None, names=['frame', 'xc', 'yc', 'w', 'h', 'effort'])
 
 # Convert 'effort' column to numeric; non-numeric entries will be set to NaN
 data['effort'] = pd.to_numeric(data['effort'], errors='coerce')
@@ -20,7 +20,7 @@ data['effort'] = data['effort'].interpolate(method='linear')
 data['frame'] = data['frame'].astype(int)
 
 # Load target.csv
-target = pd.read_csv('target.csv')  # Assumes columns 'frame' and 'value'
+target = pd.read_csv('data/target.csv')  # Assumes columns 'frame' and 'value'
 
 # Ensure 'frame' is integer type for merging
 target['frame'] = target['frame'].astype(int)
@@ -113,4 +113,4 @@ print(classification_report(y_test, y_pred))
 
 # Write predictions to CSV with the same syntax as target.csv
 predictions_df = pd.DataFrame({'frame': frames_test, 'value': y_pred})
-predictions_df.to_csv('predictions_svm.csv', index=False)
+predictions_df.to_csv('model_training/results/predictions_svm.csv', index=False)

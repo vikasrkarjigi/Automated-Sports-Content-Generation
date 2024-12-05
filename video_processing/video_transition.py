@@ -75,7 +75,7 @@ def create_transition(cap, start_frame, end_frame, transition_type='fade', durat
 
 def main():
     # Open the video file
-    cap = cv2.VideoCapture('output_video.mp4')
+    cap = cv2.VideoCapture('video_processing/results/output_video.mp4')
 
     # Get total number of frames in the video
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -148,6 +148,7 @@ def main():
         print(f"An error occurred: {str(e)}")
 
     finally:
+        print("Transitions applied successfully to the video.")
         # Clean up resources
         cap.release()
         out.release()

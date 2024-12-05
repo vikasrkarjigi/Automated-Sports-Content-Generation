@@ -1,8 +1,15 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # Read the CSV file
-df = pd.read_csv('provided_data.csv')
+df = pd.read_csv('data/provided_data.csv')
+
+# Define the directory for saving plots
+save_path = 'data_preprocessing/results/'
+
+# Ensure the directory exists
+os.makedirs(save_path, exist_ok=True)
 
 # Display the first 5 rows
 print(df.head())
@@ -20,7 +27,7 @@ plt.xlabel('Frame Number')
 plt.ylabel('Value')
 plt.title('Plot of Second Column vs Frame Number')
 plt.grid(True)
-plt.savefig('plot.png')
+plt.savefig(os.path.join(save_path, 'plot.png'))
 plt.show()
 
 #Scatter Plot
@@ -30,7 +37,7 @@ plt.xlabel("Frame Number")
 plt.ylabel('Value')
 plt.title('Scatter Plot of Second Column vs Frame Number')
 plt.grid(False)
-plt.savefig('scatter_plot.png')
+plt.savefig(os.path.join(save_path, 'scatter_plot.png'))
 plt.show()
 
 #Multiple columns plot
@@ -43,7 +50,7 @@ plt.xlabel('Frame Number')
 plt.ylabel('Value')
 plt.title('Multiple Column vs Frame Number')
 plt.legend()
-plt.savefig('multiple_column_plot.png')
+plt.savefig(os.path.join(save_path, 'multiple_column_plot.png'))
 plt.show()
 
 #Histogram Plot
@@ -53,7 +60,7 @@ plt.xlabel('Value')
 plt.ylabel('Frequency')
 plt.title('Histogram of Column 3')
 plt.grid(True)
-plt.savefig('Histogram_plot.png')
+plt.savefig(os.path.join(save_path, 'histogram_plot.png'))
 plt.show()
 
 # Subplots for Multiple Visualizations
@@ -83,5 +90,5 @@ axs[1, 1].set_title('Box Plot')
 axs[1, 1].set_ylabel('Value')
 
 plt.tight_layout()
-plt.savefig('Subplots.png')
+plt.savefig(os.path.join(save_path, 'subplots.png'))
 plt.show()

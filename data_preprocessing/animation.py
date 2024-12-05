@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 # Read the CSV file
-df = pd.read_csv('provided_data.csv')
+df = pd.read_csv('data/provided_data.csv')
 
 # Display the first 5 rows
 print(df.head())
@@ -17,7 +17,7 @@ print(df.describe())
 def create_animation(df):
     # Set up the video writer
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter('animation.mp4', fourcc, 30.0, (800, 600))
+    out = cv2.VideoWriter('data_preprocessing/results/animation.mp4', fourcc, 30.0, (800, 600))
 
     # Normalize coordinates to fit within the frame
     x_min, x_max = df.iloc[:, 1].min(), df.iloc[:, 1].max()
