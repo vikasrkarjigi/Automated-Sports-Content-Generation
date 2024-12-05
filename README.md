@@ -213,8 +213,7 @@ These transitions are useful for creating professional-looking highlight reels t
 The **Automated Highlight Generation System for Volleyball** successfully generated meaningful highlights from volleyball match videos. Here are the key results:
 
 1. **Model Performance**:
-   - The SVM classifier was trained and validated with various feature sets, yielding impressive classification accuracy. Hyperparameter optimization improved the **weighted F1 score**, making the model more reliable for detecting key events in the game. below is the result from the classification report
-
+    - The SVM classifier was trained and validated using multiple feature sets, achieving impressive classification accuracy. Through hyperparameter optimization, the model's weighted F1 score was significantly improved, making it more effective and reliable in detecting key events during the game. The **weighted F1 score increased to 88%**, demonstrating the success of the optimization process. Below is the result from the classification report.
      <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px; margin-bottom: 20px">
         <img src="results/workshop_4_output.png" alt="Classification Report" width="400" height="250"/>
         <img src="results/f1_heatmap.png" alt="F1 Score HeatMap" width="400" height="250"/>
