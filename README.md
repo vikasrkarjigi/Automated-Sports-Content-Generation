@@ -6,7 +6,7 @@
 ## Output Highlights
 
 Watch the final volleyball match highlights, featuring smooth transitions and key moments:  
-[![Watch Highlights on YouTube](https://img.shields.io/badge/YouTube-Watch%20Now-red?logo=youtube)](https://youtu.be/JUGTQxPZ4bU)
+[![Watch Highlights on YouTube](https://img.shields.io/badge/YouTube-Watch%20Now-red?logo=youtube)](https://youtu.be/YOugo51-bzQ)
 
 ---
 
@@ -60,12 +60,8 @@ The project is divided into several key phases, each focusing on different aspec
 
 Before running the project, ensure that you have the following dependencies installed:
 
-- Python 3.7+
-- OpenCV
-- NumPy
-- Scikit-learn
-- Matplotlib
-- Pandas
+- Python 3.9.18 (Project tested on this version)
+- All required dependencies listed in the `requirements.txt` file
 
 ### Steps to Install
 
@@ -96,49 +92,50 @@ Before running the project, ensure that you have the following dependencies inst
 
 - **Data Analysis and Visualization**: Clean the data and visualize plots (histogram, scatter, boxplot, etc.) using `data_analysis_Initial.py`:
     ```bash
-    python data_analysis_Initial.py
+    python data_preprocessing/data_analysis_Initial.py
     ```
 
 - **Custom Feature Engineering**: Add custom derivative features such as "time spent in region" with `data_analysis_custom_feature.py`:
     ```bash
-    python data_analysis_custom_feature.py
+    python data_preprocessing/data_analysis_custom_feature.py
     ```
 
 - **Feature Visualization**: Visualize the custom features with ball tracking in a video using `animation.py`:
     ```bash
-    python animation.py
+    python data_preprocessing/animation.py
     ```
   
 ### 2. Train the Model
 
 - **Train & Test**: Train the SVM model on preprocessed data and test on 30% of the remaining data. Visualize predictions using:
     ```bash
-    python time_classification.py
-    python visualize_target.py
+    python model_training/time_classification.py
+    python .\model_training\visualize_target.py .\data\tracking_visualization.mp4 .\model_training\results\predictions_svm.csv --output .\model_training\results\prediction_svm_video.mp4  
     ```
 - **Enhance Performance**: Add feature engineering (aspect ratio, size) and perform hyperparameter tuning (C, gamma, kernel) for improved accuracy. Visualize the results:
     ```bash
-    python time_classification_hyperparameter.py
-    python visualize_target.py
+    python model_training/time_classification_hyperparameter.py
+    python .\model_training\visualize_target.py .\data\tracking_visualization.mp4 .\model_training\results\predictions_svm_hyperparameter.csv --output .\model_training\results\prediction_svm_hyperparameter_video.mp4  
     ```
 
-### 3. Highlight Generation:
-   - Once the model is trained, run the highlight generation script to create the highlights from a video:
-     ```bash
-     python generate_highlights.py --video video.mp4 --output highlights.mp4
-     ```
-
-### 4. Video Transition:
-   - Apply transitions between key moments in the video:
-     ```bash
-     python video_transition.py
-     ```
-
-### 5. Smoothed Predictions:
+### 3. Smoothed Predictions:
    - Apply advanced smoothing techniques to reduce noise in the predictions:
      ```bash
-     python filter_predictions.py
+     python  .\video_processing\filter_predictions.py
      ```
+
+### 4. Highlight Generation:
+   - Once the model is trained, run the highlight generation script to create the highlights from a video:
+     ```bash
+     python  .\video_processing\opencv_intro.py .\model_training\results\prediction_svm_hyperparameter_video.mp4 --csv .\video_processing\results\smoothed_predictions.csv --filters --crop 10 10 80 80
+     ```
+
+### 5. Video Transition:
+   - Apply transitions between key moments in the video:
+     ```bash
+     python .\video_processing\video_transition.py
+     ```
+
 
 ---
 
@@ -148,27 +145,29 @@ Before running the project, ensure that you have the following dependencies inst
 Automated-Highlight-Generation/
 │
 ├── data/                         # Contains raw data and videos
-│   ├── video.mp4                 # Input video file
+│   ├── tracking_visualization.mp4    # Input video file
 │   ├── provided_data.csv         # Raw trajectory data
 │   └── target.csv                # Classification target data
 │
-├── scripts/                      # Python scripts for different stages
-│   ├── data_preprocessing/       # Data collection and preprocessing
-│   │   ├── data_analysis_initial.py   # Initial data cleaning and visualization
-│   │   ├── data_analysis_custom_feature.py  # Adding custom features
-│   │   └── animation.py          # Visualize custom features with ball tracking
-│   │
-│   ├── model_training/           # Model selection and training
-│   │   ├── time_classification.py    # Train SVM classifier
-│   │   ├── time_classification_hyperparameter.py  # Hyperparameter tuning and model refinement
-│   │   └── visualize_target.py     # Visualize model predictions on video
-│   │
-│   ├── video_processing/         # Video smoothing and transitions
-│   │   ├── filter_predictions.py  # Apply advanced filtering techniques
-│   │   ├── opencv_intro.py        # Highlight generation with OpenCV
-│   │   └── video_transition.py    # Apply transitions between video segments
+├── data_preprocessing/           # Data collection and preprocessing
+│   ├── data_analysis_initial.py   # Initial data cleaning and visualization
+│   ├── data_analysis_custom_feature.py  # Adding custom features
+│   ├── animation.py              # Visualize custom features with ball tracking
+│   ├── results/                  # Results generated by data preprocessing scripts
 │
-├── results/                      # Output files
+├── model_training/               # Model selection and training
+│   ├── time_classification.py        # Train SVM classifier
+│   ├── time_classification_hyperparameter.py  # Hyperparameter tuning and model refinement
+│   ├── visualize_target.py           # Visualize model predictions on video
+│   ├── results/                      # Results generated by model training scripts
+│
+├── video_processing/             # Video smoothing and transitions
+│   ├── filter_predictions.py        # Apply advanced filtering techniques
+│   ├── opencv_intro.py              # Highlight generation with OpenCV
+│   ├── video_transition.py          # Apply transitions between video segments
+│   ├── results/                     # Results generated by video processing scripts
+│
+├── results/                      # General output files
 │   ├── smoothed_predictions.csv  # Smoothed model predictions
 │   ├── transition.mp4            # Video with transitions
 │   └── output_video.mp4          # Video without transitions
@@ -243,7 +242,7 @@ The **Automated Highlight Generation System for Volleyball** successfully genera
 
 5. **Final Output**:
    - The final video, **enhanced_transition_full_video.mp4**, consists of highlights with smooth transitions, ready for presentation or sharing with audiences. This video showcases the model's ability to generate dynamic, engaging highlight clips with high-quality video transitions.
-    [Watch the Full Video Highlight on YouTube](https://youtu.be/JUGTQxPZ4bU)
+    [Watch the Full Video Highlight on YouTube](https://youtu.be/YOugo51-bzQ)
 ---
 
 ## Evaluation and Metrics
